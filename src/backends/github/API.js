@@ -1,6 +1,7 @@
 import LocalForage from "localforage";
 import { Base64 } from "js-base64";
 import _ from "lodash";
+import Immutable from "immutable";
 import { filterPromises, resolvePromiseProperties } from "../../lib/promiseHelper";
 import AssetProxy from "../../valueObjects/AssetProxy";
 import { SIMPLE, EDITORIAL_WORKFLOW, status } from "../../constants/publishModes";
@@ -248,6 +249,17 @@ export default class API {
         return this.editorialWorkflowGit(fileTree, entry, mediaFilesList, options);
       }
     });
+  }
+
+  deleteFile(path, message, options={}) {
+    const branch = options.branch || this.branch;
+    // We need to request the file first to get the SHA
+    return this.request(`${ this.repoURL }/contents/${ path }`)
+    .then(({ sha }) =>
+       this.request(`${ this.repoURL }/contents/${ path }?sha=${ sha }&message=${ message }&branch=${ branch }`, {
+         method: "DELETE",
+       })
+    );
   }
 
   editorialWorkflowGit(fileTree, entry, filesList, options) {

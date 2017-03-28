@@ -203,6 +203,13 @@ class Backend {
     });
   }
 
+  deleteEntry(config, collection, slug) {
+    // TODO: delete unpublished edits to deleted entries
+    const path = selectEntryPath(collection, slug);
+    const commitMessage = `Delete ${ collection.get("label") } “${ slug }”`;
+    return this.implementation.deleteFile(path, commitMessage);
+  }
+
   persistUnpublishedEntry(config, collection, entryDraft, MediaFiles) {
     return this.persistEntry(config, collection, entryDraft, MediaFiles, { unpublished: true });
   }

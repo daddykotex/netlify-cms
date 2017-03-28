@@ -30,6 +30,10 @@ export const ENTRY_PERSIST_REQUEST = 'ENTRY_PERSIST_REQUEST';
 export const ENTRY_PERSIST_SUCCESS = 'ENTRY_PERSIST_SUCCESS';
 export const ENTRY_PERSIST_FAILURE = 'ENTRY_PERSIST_FAILURE';
 
+export const ENTRY_DELETE_REQUEST = 'ENTRY_DELETE_REQUEST';
+export const ENTRY_DELETE_SUCCESS = 'ENTRY_DELETE_SUCCESS';
+export const ENTRY_DELETE_FAILURE = 'ENTRY_DELETE_FAILURE';
+
 /*
  * Simple Action Creators (Internal)
  * We still need to export them for tests
@@ -121,6 +125,37 @@ export function entryPersistFail(collection, entry, error) {
     payload: {
       collectionName: collection.get('name'),
       entrySlug: entry.get('slug'),
+      error: error.toString(),
+    },
+  };
+}
+
+export function entryDeleting(collection, slug) {
+  return {
+    type: ENTRY_DELETE_REQUEST,
+    payload: {
+      collectionName: collection.get('name'),
+      entrySlug: slug,
+    },
+  };
+}
+
+export function entryDeleted(collection, slug) {
+  return {
+    type: ENTRY_DELETE_SUCCESS,
+    payload: {
+      collectionName: collection.get('name'),
+      entrySlug: slug,
+    },
+  };
+}
+
+export function entryDeleteFail(collection, slug, error) {
+  return {
+    type: ENTRY_DELETE_FAILURE,
+    payload: {
+      collectionName: collection.get('name'),
+      entrySlug: slug,
       error: error.toString(),
     },
   };
@@ -254,5 +289,30 @@ export function persistEntry(collection) {
         }));
         dispatch(entryPersistFail(collection, entry, error));
       });
+  };
+}
+
+export function deleteEntry(collection, slug) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const backend = currentBackend(state.config);
+
+    if (!window.confirm("Are you sure you want to delete this entry?")) { return; }
+
+    dispatch(entryDeleting(collection, slug));
+    backend.deleteEntry(state.config, collection, slug)
+    .then(() => {
+      dispatch(entryDeleted(collection, slug));
+      dispatch(closeEntry(collection));
+    })
+    .catch((error) => {
+      dispatch(notifSend({
+        message: `Failed to delete entry: ${ error }`,
+        kind: 'danger',
+        dismissAfter: 8000,
+      }));
+      console.error(error);
+      dispatch(entryDeleteFail(collection, slug, error));
+    });
   };
 }

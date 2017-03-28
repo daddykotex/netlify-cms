@@ -68,6 +68,7 @@ function mapStateToProps(state, ownProps) {
   const page = state.entries.getIn(['pages', collection.get('name'), 'page']);
 
   const entries = selectEntries(state, collection.get('name'));
+  console.log(entries);
 
   return { slug, publicFolder, collection, collections, page, entries };
 }

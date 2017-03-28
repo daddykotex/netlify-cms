@@ -10,6 +10,7 @@ import {
   changeDraftField,
   changeDraftFieldValidation,
   persistEntry,
+  deleteEntry,
 } from '../actions/entries';
 import { closeEntry } from '../actions/editor';
 import { addAsset, removeAsset } from '../actions/media';
@@ -85,9 +86,15 @@ class EntryPage extends React.Component {
   handlePersistEntry = () => {
     const { persistEntry, collection } = this.props;
     setTimeout(() => {
-      persistEntry(collection);  
+      persistEntry(collection);
     }, 0);
   };
+
+  handleDeleteEntry = () => {
+    const { deleteEntry, entry, collection } = this.props;
+    const slug = entry.get('slug');
+    deleteEntry(collection, slug);
+  }
 
   render() {
     const {
@@ -124,6 +131,7 @@ class EntryPage extends React.Component {
         onAddAsset={addAsset}
         onRemoveAsset={removeAsset}
         onPersist={this.handlePersistEntry}
+        onDelete={this.handleDeleteEntry}
         onCancelEdit={this.handleCloseEntry}
       />
     );
@@ -162,6 +170,7 @@ export default connect(
     createEmptyDraft,
     discardDraft,
     persistEntry,
+    deleteEntry,
     closeEntry,
     openSidebar,
   }

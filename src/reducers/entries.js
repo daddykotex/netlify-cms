@@ -5,6 +5,7 @@ import {
   ENTRY_FAILURE,
   ENTRIES_REQUEST,
   ENTRIES_SUCCESS,
+  ENTRY_DELETE_SUCCESS,
 } from '../actions/entries';
 
 import { SEARCH_ENTRIES_SUCCESS } from '../actions/search';
@@ -56,6 +57,9 @@ const entries = (state = Map({ entities: Map(), pages: Map() }), action) => {
           map.setIn(['entities', `${ entry.collection }.${ entry.slug }`], fromJS(entry).set('isFetching', false))
         ));
       });
+
+    case ENTRY_DELETE_SUCCESS:
+      return state.deleteIn(['entities', `${ action.payload.collectionName }.${ action.payload.entrySlug }`]);
 
     default:
       return state;
