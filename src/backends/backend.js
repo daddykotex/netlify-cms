@@ -1,4 +1,5 @@
 import TestRepoBackend from "./test-repo/implementation";
+import FileSystemBackend from "./file-system/implementation";
 import GitHubBackend from "./github/implementation";
 import NetlifyAuthBackend from "./netlify-auth/implementation";
 import { resolveFormat } from "../formats/formats";
@@ -252,6 +253,8 @@ export function resolveBackend(config) {
   switch (name) {
     case "test-repo":
       return new Backend(new TestRepoBackend(config), authStore);
+    case "file-system":
+      return new Backend(new FileSystemBackend(config), authStore);
     case "github":
       return new Backend(new GitHubBackend(config), authStore);
     case "netlify-auth":
